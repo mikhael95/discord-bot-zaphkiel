@@ -62,6 +62,7 @@ namespace BotDiscord
         {
             var msg = msgParam as SocketUserMessage;
             var prefix = '?';
+            var systemPrefix = '!';
             var channelLog = client.GetChannel(372360498177507338) as SocketTextChannel;
 
             if (msg == null)
@@ -70,8 +71,8 @@ namespace BotDiscord
             }
 
             var argPos = 0;
-
-            if ((msg.HasCharPrefix(prefix, ref argPos) || msg.HasMentionPrefix(client.CurrentUser, ref argPos)) == false)
+            
+            if ((msg.HasCharPrefix(systemPrefix, ref argPos))||(msg.HasCharPrefix(prefix, ref argPos) || msg.HasMentionPrefix(client.CurrentUser, ref argPos)) == false)
             {
                 
                 return;
@@ -79,7 +80,7 @@ namespace BotDiscord
             var context = new CommandContext(client, msg);
             var result = await commands.ExecuteAsync(context, argPos, services);
 
-            //error blm fix
+            
             if (result.IsSuccess == false)
             {
                 await context.Channel.SendMessageAsync(result.ErrorReason);

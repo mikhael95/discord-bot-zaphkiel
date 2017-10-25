@@ -34,17 +34,16 @@ Commands:
 ?info [mention] - showing info of specific user
 ?infoGuild / ?ig - showing guild info
 ?stop - stopping bot process
-?tube [keyword] - search music in youtube [NOT WORKING]
 ?search or s [keyword]- use google
 ```
 ");
         }
         
-        [Command("Play", RunMode = RunMode.Async)]
-        public async Task PlayCmd([Remainder] string song)
-        {
-            await this.AudioService.SendAudioAsync(Context.Guild, Context.Channel, song);
-        }
+        //[Command("Play", RunMode = RunMode.Async)]
+        //public async Task PlayCmd([Remainder] string song)
+        //{
+        //    await this.AudioService.SendAudioAsync(Context.Guild, Context.Channel, song);
+        //}
         
         [Command("Search", RunMode = RunMode.Async)]
         [Summary("Search keyword with google api")]
@@ -52,8 +51,15 @@ Commands:
         public async Task Google(string keyword)
         {
             var searchResult = await this.BasicService.GoogleSearch(keyword);
-            await ReplyAsync(searchResult.Snippet);
-            await ReplyAsync(searchResult.Link);
+            if (searchResult == null)
+            { 
+                await ReplyAsync($"Your search - {keyword} - did not match any documents.");
+            }
+            else
+            {
+                await ReplyAsync(searchResult[0].Snippet);
+                await ReplyAsync(searchResult[0].Link);
+            }
         }
 
         [Command("Info")]

@@ -33,13 +33,13 @@ Created At: {guild.CreatedAt}
 Voice Region ID: {guild.VoiceRegionId}
 ```";
         }
-        public async Task<GoogleViewModel> GoogleSearch(string keyword)
+        public async Task<List<GoogleViewModel>> GoogleSearch(string keyword)
         {
             var client = new HttpClient();
             var content = await client.GetAsync($"https://www.googleapis.com/customsearch/v1?key=AIzaSyDJ9CUdfCsjkDIYId3fmfvKVGjbHk48hR8&cx=010065256725983153448:itwnk8vx56k&q={keyword}&num=5&searchType=image");
             var response = JsonConvert.DeserializeObject<SearchViewModel>(await content.Content.ReadAsStringAsync());
 
-            return response.Items[0];
+            return response.Items;
             //var response = await client.GetStringAsync(uri);
 
         }
