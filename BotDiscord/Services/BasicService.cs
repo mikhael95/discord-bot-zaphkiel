@@ -9,24 +9,41 @@ namespace BotDiscord.Services
 {
     public class BasicService
     {
-        public string GetInfo(IGuildUser user)
+        public EmbedBuilder GetInfo(IGuildUser user)
         {
-            return $@"```css
-User: {user.ToString()}
-NickName: {user.Nickname}
-User Id: #{user.Id}
-Bot: {user.IsBot}
-Game: {user.Game}
-Status: {user.Status}```";
+            return new EmbedBuilder()
+                .WithAuthor(user.ToString(), user.GetAvatarUrl())
+                .WithColor(Discord.Color.Teal)
+                .AddInlineField("Nickname", user.Nickname??"None")
+                .AddInlineField("Id", user.Id)
+                .AddInlineField("Bot", user.IsBot)
+                .AddInlineField("Game", user.Game?.ToString() ?? "Not playing any game")
+                .AddField("Status", user.Status);
+            
+
+            //            return $@"```css
+            //User: {user.ToString()}
+            //NickName: {user.Nickname}
+            //User Id: #{user.Id}
+            //Bot: {user.IsBot}
+            //Game: {user.Game}
+            //Status: {user.Status}```";
         }
-        public string GetInfoGuild(IGuild guild)
+        public EmbedBuilder GetInfoGuild(IGuild guild)
         {
-            return $@"```css
-Guild ID: #{guild.Id}
-Guild: {guild.ToString()}
-Created At: {guild.CreatedAt}
-Voice Region ID: {guild.VoiceRegionId}
-```";
+            return new EmbedBuilder()
+                .WithAuthor(guild.ToString(), guild.IconUrl)
+                .WithColor(Discord.Color.Gold)
+                .WithThumbnailUrl(guild.SplashUrl)
+                .AddInlineField("Guild Id", guild.Id)
+                .AddInlineField("Region", guild.VoiceRegionId)
+                .AddInlineField("DOB", guild.CreatedAt);
+//            return $@"```css
+//Guild ID: #{guild.Id}
+//Guild: {guild.ToString()}
+//Created At: {guild.CreatedAt}
+//Voice Region ID: {guild.VoiceRegionId}
+//```";
         }
         public async Task<List<GoogleViewModel>> GoogleSearchImg(string keyword)
         {

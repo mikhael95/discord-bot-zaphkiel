@@ -11,94 +11,101 @@ namespace BotDiscord
 {
     class Program
     {
-        private CommandService commands;
-        private DiscordSocketClient client;
-        private IServiceProvider services;
+        private CommandService Commands;
+        private DiscordSocketClient Client;
+        private IServiceProvider Services;
 
         //string token = "MzcyMjY0MjAxNzU1OTUxMTA1.DNBpsA.T_rGF62MljARRi5PNnrhXLAAvbc"; development bot
-        string token = "MzczMDIwMzUxOTM4MTY2Nzg2.DNMp0w.Hmp30HTLYj1mkoPt8Hb3eS8Nktc";//zaphkiel
+        string Token = "MzczMDIwMzUxOTM4MTY2Nzg2.DNMp0w.Hmp30HTLYj1mkoPt8Hb3eS8Nktc";//zaphkiel
+        ulong DefaultChannel = 371949012724744195;
         static void Main(string[] args) => new Program().Start().GetAwaiter().GetResult();
         public async Task Start()
         {
-            commands = new CommandService();
-            client = new DiscordSocketClient();
+            Commands = new CommandService();
+            Client = new DiscordSocketClient();
             var builder = new ServiceCollection();
 
             builder.AddTransient<BasicService>();
-            services = builder.BuildServiceProvider();
+            Services = builder.BuildServiceProvider();
             
             await InstallCommands();
 
-            await client.LoginAsync(TokenType.Bot, token);
-            await client.StartAsync();
-            await client.SetGameAsync("God | ?help");
-            
-            client.Log += Log;
-            client.UserJoined += UserJoined;
-            client.UserLeft += UserLeft;
-            client.Disconnected += Disconnected;
+            await Client.LoginAsync(TokenType.Bot, Token);
+            await Client.StartAsync();
+            await Client.SetGameAsync("God | ?help");
+
+            Client.Connected += Connected;
+            Client.LoggedIn += Connected;
+            Client.Log += Log;
+            Client.UserJoined += UserJoined;
+            Client.UserLeft += UserLeft;
+            Client.Disconnected += Disconnected;
             
             await Task.Delay(-1);
         }
         public async Task UserJoined(SocketGuildUser user)
         {
             //ID Channel
-            var channel = client.GetChannel(371949012724744195) as SocketTextChannel;
+            var channel = Client.GetChannel(DefaultChannel) as SocketTextChannel;
             await channel.SendMessageAsync($"Hey {user.Mention}! <:AkarinWave:370855004921135104>");
         }
 
         public async Task UserLeft(SocketGuildUser user)
         {
-            var channel = client.GetChannel(371949012724744195) as SocketTextChannel;
+            var channel = Client.GetChannel(DefaultChannel) as SocketTextChannel;
             await channel.SendMessageAsync($"Goodbye {user.Mention}, we will miss you");
         }
         public async Task Disconnected(Exception e)
         {
-            var channel = client.GetChannel(371949012724744195) as SocketTextChannel;
+            var channel = Client.GetChannel(DefaultChannel) as SocketTextChannel;
             await channel.SendMessageAsync($"Sayonara <:AS003:371971289554092046>");
+        }
+        public async Task Connected()
+        {
+            var channel = Client.GetChannel(DefaultChannel) as SocketTextChannel;
+            await channel.SendMessageAsync($"Hi guys, I'm back online <:AS003:371971289554092046>");
         }
         public async Task InstallCommands()
         {
-            //client.LoggedIn
             
-            client.MessageReceived += HandleCommand;
-            await commands.AddModulesAsync(Assembly.GetEntryAssembly());
+            Client.MessageReceived += HandleCommand;
+            await Commands.AddModulesAsync(Assembly.GetEntryAssembly());
         }
         public async Task HandleCommand(SocketMessage msgParam)
         {
             var msg = msgParam as SocketUserMessage;
             var prefix = '?';
             var systemPrefix = '!';
-            
+            var argPos = 0;
 
             if (msg == null)
             {
                 return;
             }
 
-            var argPos = 0;
-            
-            if ((msg.HasCharPrefix(systemPrefix, ref argPos))||(msg.HasCharPrefix(prefix, ref argPos) || msg.HasMentionPrefix(client.CurrentUser, ref argPos)) == false)
+            if ((msg.HasCharPrefix(systemPrefix, ref argPos))||(msg.HasCharPrefix(prefix, ref argPos) || msg.HasMentionPrefix(Client.CurrentUser, ref argPos)) == false)
             {
                 return;
             }
-            var context = new CommandContext(client, msg);
-            var result = await commands.ExecuteAsync(context, argPos, services);
+            var context = new CommandContext(Client, msg);
+            var result = await Commands.ExecuteAsync(context, argPos, Services);
 
-            var channelLog = client.GetChannel(372360498177507338) as SocketTextChannel;
+            var channelLog = Client.GetChannel(372360498177507338) as SocketTextChannel;
             if (result.IsSuccess == false)
             {
                 await context.Channel.SendMessageAsync($@"```css
 [{result.ErrorReason}]```");
 
                 await channelLog.SendMessageAsync($@"```css
-Error Log by {context.User.Username} => {msg.Content}
+Error Log by {context.User.Username} in #{context.Channel.Name} => {msg.Content}
 [{result.ErrorReason}]```");
+                //await context.Message.DeleteAsync();
             }
             else
             {
                 await channelLog.SendMessageAsync($@"```css
-Command Log by {context.User.Username} => {msg.Content}```");
+Command Log by {context.User.Username} in #{context.Channel.Name} => {msg.Content}```");
+                
             }
         }
 

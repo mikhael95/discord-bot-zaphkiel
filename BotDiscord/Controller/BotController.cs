@@ -10,7 +10,8 @@ namespace BotDiscord
     {
 
         private readonly BasicService BasicService;
-        
+        private EmbedBuilder Embed;
+        bool TTS = false;
         // Remember to add an instance of the AudioService
         // to your IServiceCollection when you initialize your bot
         public BotController(BasicService basicService)
@@ -23,21 +24,22 @@ namespace BotDiscord
         [Alias("h")]
         public async Task Help()
         {
-            string msg = @"```css
-Commands:
-?del [number] - delete message 
-?help or ?h - show all commands available
-?info [mention] - show user information
-?infoGuild or ?ig - show guild info
-?stop - stop bot process
-?searchImage or ?img [keyword] - search image
-?searchDoc or ?doc [keyword] - search document
-?play or ?p [keyword] - play video
-?nsfw - Use at your own risk
-
-#Elmiel
-```";
-            await ReplyAsync(msg);
+            Embed = new EmbedBuilder()
+                .WithColor(Discord.Color.Orange)
+                .WithAuthor("Commands")
+                .WithDescription("This bot is dedicated to search document, webpage, image, music,or video")
+                .AddField("?help or ?h", "show all commands available")
+                .AddInlineField("img [keyword]", "search image")
+                .AddInlineField("doc [keyword]", "search document")
+                .AddInlineField("play [keyword]", "play video")
+                .AddInlineField("del [number]", "delete message")
+                .AddInlineField("info [mention]", "show user information")
+                .AddInlineField("ig", "show guild info")
+                .AddInlineField("stop", "stop bot process")
+                .AddField("nsfw", "Use at your own risk")
+                .WithFooter("This Bot is made by Elmiel")
+                .WithCurrentTimestamp();
+            await ReplyAsync("", TTS, Embed);
         }
 
         [Command("SearchImage", RunMode = RunMode.Async)]
@@ -96,15 +98,8 @@ Commands:
                 var rand = new Random();
                 var result = rand.Next(0, searchResult.Count);
                 await ReplyAsync(searchResult[result].Snippet);
-                await ReplyAsync(searchResult[result].Link);
+                await ReplyAsync($"{searchResult[result].Link}");
             }
-        }
-
-        [Command("Info")]
-        [Summary("Get User Info")]
-        public async Task CheckInfo(IGuildUser user)
-        {
-            await ReplyAsync(BasicService.GetInfo(user));
         }
 
         [Command("Info")]
@@ -112,19 +107,26 @@ Commands:
         [Summary("Get User Info")]
         public async Task CheckInfo()
         {
-            var server = Context.Guild;
-            var user = await server.GetUserAsync(Context.User.Id);
-            await ReplyAsync(BasicService.GetInfo(user));
+            //var server = Context.Guild;
+            //var user = await server.GetUserAsync(Context.User.Id);
+            await ReplyAsync("", TTS, BasicService.GetInfo(await Context.Guild.GetUserAsync(Context.User.Id)));
+        }
+
+        [Command("Info")]
+        [Priority(2)]
+        [Summary("Get User Info")]
+        public async Task CheckInfo(IGuildUser user)
+        {
+            await ReplyAsync("", TTS, BasicService.GetInfo(user));
 
         }
 
         [Command("InfoGuild")]
-        [Priority(2)]
         [Summary("Get User Info")]
         [Alias("ig")]
         public async Task CheckInfoGuild()
         {
-            await ReplyAsync(BasicService.GetInfoGuild(Context.Guild));
+            var m = await ReplyAsync("",TTS,BasicService.GetInfoGuild(Context.Guild));
         }
 
         [Command("Stop", RunMode = RunMode.Async)]
