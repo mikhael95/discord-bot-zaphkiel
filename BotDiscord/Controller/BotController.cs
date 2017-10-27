@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Discord.Commands;
 using System.Threading.Tasks;
 using Discord;
@@ -12,14 +10,12 @@ namespace BotDiscord
     {
 
         private readonly BasicService BasicService;
-        private readonly AudioService AudioService;
-
+        
         // Remember to add an instance of the AudioService
         // to your IServiceCollection when you initialize your bot
-        public BotController(BasicService basicService, AudioService audioService)
+        public BotController(BasicService basicService)
         {
             this.BasicService = basicService;
-            this.AudioService = audioService;
         }
 
         [Command("Help")]
@@ -27,38 +23,80 @@ namespace BotDiscord
         [Alias("h")]
         public async Task Help()
         {
-            await ReplyAsync(@"```css
+            string msg = @"```css
 Commands:
-?del [number_of_message] - deleting message 
-?help - showing all commands available
-?info [mention] - showing info of specific user
-?infoGuild / ?ig - showing guild info
-?stop - stopping bot process
-?search or s [keyword]- use google
-```
-");
+?del [number] - delete message 
+?help or ?h - show all commands available
+?info [mention] - show user information
+?infoGuild or ?ig - show guild info
+?stop - stop bot process
+?searchImage or ?img [keyword] - search image
+?searchDoc or ?doc [keyword] - search document
+?play or ?p [keyword] - play video
+?nsfw - Use at your own risk
+
+#Elmiel
+```";
+            await ReplyAsync(msg);
         }
-        
-        //[Command("Play", RunMode = RunMode.Async)]
-        //public async Task PlayCmd([Remainder] string song)
-        //{
-        //    await this.AudioService.SendAudioAsync(Context.Guild, Context.Channel, song);
-        //}
-        
-        [Command("Search", RunMode = RunMode.Async)]
+
+        [Command("SearchImage", RunMode = RunMode.Async)]
         [Summary("Search keyword with google api")]
-        [Alias("s")]
-        public async Task Google(string keyword)
+        [Alias("img", "i")]
+        public async Task GoogleImg([Remainder]string keyword)
         {
-            var searchResult = await this.BasicService.GoogleSearch(keyword);
+            var searchResult = await this.BasicService.GoogleSearchImg(keyword);
             if (searchResult == null)
-            { 
-                await ReplyAsync($"Your search - {keyword} - did not match any documents.");
+            {
+                await ReplyAsync($"Your search - ***{keyword}*** - did not match any documents.");
             }
             else
             {
-                await ReplyAsync(searchResult[0].Snippet);
-                await ReplyAsync(searchResult[0].Link);
+                //searchResult.Count
+                var rand = new Random();
+                var result = rand.Next(0, searchResult.Count);
+                await ReplyAsync(searchResult[result].Snippet);
+                await ReplyAsync(searchResult[result].Link);
+            }
+        }
+
+        [Command("SearchDoc", RunMode = RunMode.Async)]
+        [Summary("Search keyword with google api")]
+        [Alias("doc", "s")]
+        public async Task GoogleDoc([Remainder]string keyword)
+        {
+            var searchResult = await this.BasicService.GoogleSearchDoc(keyword);
+            if (searchResult == null)
+            {
+                await ReplyAsync($"Your search - ***{keyword}*** - did not match any documents.");
+            }
+            else
+            {
+                //searchResult.Count
+                var rand = new Random();
+                var result = rand.Next(0, searchResult.Count);
+                await ReplyAsync(searchResult[result].Snippet);
+                await ReplyAsync(searchResult[result].Link);
+            }
+        }
+
+        [Command("Play", RunMode = RunMode.Async)]
+        [Summary("Play video from youtube")]
+        [Alias("p")]
+        public async Task PlayVideo([Remainder]string keyword)
+        {
+            var searchResult = await this.BasicService.GoogleSearchVid(keyword);
+            if (searchResult == null)
+            {
+                await ReplyAsync($"Your search - ***{keyword}*** - did not match any documents.");
+            }
+            else
+            {
+                //searchResult.Count
+                var rand = new Random();
+                var result = rand.Next(0, searchResult.Count);
+                await ReplyAsync(searchResult[result].Snippet);
+                await ReplyAsync(searchResult[result].Link);
             }
         }
 
@@ -91,14 +129,14 @@ Commands:
 
         [Command("Stop", RunMode = RunMode.Async)]
         [Summary("Stoping bot process")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.KickMembers)]
         public async Task ShutDown()
         {
             var client = Context.Client;
-            var message = await ReplyAsync("Stoping bot process in 5 seconds...");
+            var message = await ReplyAsync("Stoping bot process in ***5*** seconds...");
             for (int i = 4; i > 0; i--)
             {
-                await message.ModifyAsync(Q => Q.Content = $"Stoping bot process in {i} seconds...");
+                await message.ModifyAsync(Q => Q.Content = $"Stoping bot process in ***{i}*** seconds...");
                 await Task.Delay(1000);
             }
             await message.DeleteAsync();
@@ -116,9 +154,28 @@ Commands:
 
             await this.Context.Channel.DeleteMessagesAsync(messages);
 
-            var m = await this.ReplyAsync($"Delete messages success");
+            var m = await this.ReplyAsync("~~Messages deleted~~");
             await Task.Delay(2000);
             await m.DeleteAsync();
+        }
+        [Command("nsfw", RunMode = RunMode.Async)]
+        [Summary("Use at your own risk")]
+        [RequireNsfw]
+        public async Task NSFW([Remainder]string keyword)
+        {
+            var searchResult = await this.BasicService.NSFW(keyword);
+            if (searchResult == null)
+            {
+                await ReplyAsync($"Your search - ***{keyword}*** - did not match any documents.");
+            }
+            else
+            {
+                //searchResult.Count
+                var rand = new Random();
+                var result = rand.Next(0, searchResult.Count);
+                await ReplyAsync(searchResult[result].Snippet);
+                await ReplyAsync(searchResult[result].Link);
+            }
         }
     }
 }
