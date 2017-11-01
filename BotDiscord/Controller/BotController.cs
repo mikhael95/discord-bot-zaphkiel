@@ -3,6 +3,8 @@ using Discord.Commands;
 using System.Threading.Tasks;
 using Discord;
 using BotDiscord.Services;
+using System.IO;
+using System.Collections.Generic;
 
 namespace BotDiscord
 {
@@ -19,7 +21,7 @@ namespace BotDiscord
             this.BasicService = basicService;
         }
 
-        [Command("Help")]
+        [Command("Help", RunMode = RunMode.Async)]
         [Summary("Showing Help Commands")]
         [Alias("h")]
         public async Task Help()
@@ -27,17 +29,18 @@ namespace BotDiscord
             Embed = new EmbedBuilder()
                 .WithColor(Discord.Color.Orange)
                 .WithAuthor("Commands")
-                .WithDescription("This bot is dedicated to search document, webpage, image, music,or video")
-                .AddField("?help or ?h", "show all commands available")
-                .AddInlineField("img [keyword]", "search image")
-                .AddInlineField("doc [keyword]", "search document")
-                .AddInlineField("play [keyword]", "play video")
-                .AddInlineField("del [number]", "delete message")
-                .AddInlineField("info [mention]", "show user information")
-                .AddInlineField("ig", "show guild info")
-                .AddInlineField("stop", "stop bot process")
+                .WithDescription(@"This bot is dedicated to search document, webpage, image, music,or video
+Use ?[command] to use the command")
+                .AddField("help or h", "Show all commands available")
+                .AddInlineField("img [keyword]", "Search image")
+                .AddInlineField("doc [keyword]", "Search document")
+                .AddInlineField("play [keyword]", "Play video")
+                .AddInlineField("del [number]", "Delete message")
+                .AddInlineField("info [mention]", "Show user information")
+                .AddInlineField("ig", "Show guild info")
+                .AddInlineField("stop", "Stop bot process")
                 .AddField("nsfw", "Use at your own risk")
-                .WithFooter("This Bot is made by Elmiel")
+                .WithFooter("Elmiel © 2017")
                 .WithCurrentTimestamp();
             await ReplyAsync("", TTS, Embed);
         }
@@ -57,6 +60,7 @@ namespace BotDiscord
                 //searchResult.Count
                 var rand = new Random();
                 var result = rand.Next(0, searchResult.Count);
+
                 await ReplyAsync(searchResult[result].Snippet);
                 await ReplyAsync(searchResult[result].Link);
             }
@@ -102,7 +106,7 @@ namespace BotDiscord
             }
         }
 
-        [Command("Info")]
+        [Command("Info", RunMode = RunMode.Async)]
         [Priority(1)]
         [Summary("Get User Info")]
         public async Task CheckInfo()
@@ -112,7 +116,7 @@ namespace BotDiscord
             await ReplyAsync("", TTS, BasicService.GetInfo(await Context.Guild.GetUserAsync(Context.User.Id)));
         }
 
-        [Command("Info")]
+        [Command("Info", RunMode = RunMode.Async)]
         [Priority(2)]
         [Summary("Get User Info")]
         public async Task CheckInfo(IGuildUser user)
@@ -121,12 +125,12 @@ namespace BotDiscord
 
         }
 
-        [Command("InfoGuild")]
+        [Command("InfoGuild", RunMode = RunMode.Async)]
         [Summary("Get User Info")]
         [Alias("ig")]
         public async Task CheckInfoGuild()
         {
-            var m = await ReplyAsync("",TTS,BasicService.GetInfoGuild(Context.Guild));
+            var m = await ReplyAsync("", TTS, BasicService.GetInfoGuild(Context.Guild));
         }
 
         [Command("Stop", RunMode = RunMode.Async)]
@@ -162,22 +166,26 @@ namespace BotDiscord
         }
         [Command("nsfw", RunMode = RunMode.Async)]
         [Summary("Use at your own risk")]
-        [RequireNsfw]
-        public async Task NSFW([Remainder]string keyword)
+        public async Task NSFW()
         {
-            var searchResult = await this.BasicService.NSFW(keyword);
-            if (searchResult == null)
+            var keywordList = new List<string>()
             {
-                await ReplyAsync($"Your search - ***{keyword}*** - did not match any documents.");
-            }
-            else
-            {
-                //searchResult.Count
-                var rand = new Random();
-                var result = rand.Next(0, searchResult.Count);
-                await ReplyAsync(searchResult[result].Snippet);
-                await ReplyAsync(searchResult[result].Link);
-            }
+                "anime hentai", "hentai manga", "Colorful hentai"
+            };
+            await Context.Channel.SendFileAsync(@"resources\pervert.jpg");
+
+            //var channel = Context.Channel;
+            //await channel.SendFileAsync(@"Image\youAreAlreadyDead.jpg");
+
+            //var rand = new Random();
+            //var result = rand.Next(0, keywordList.Count);
+            //var searchResult = await this.BasicService.NSFW(keywordList[result]);
+
+            //rand = new Random();
+            //result = rand.Next(0, searchResult.Count);
+            //await ReplyAsync(searchResult[result].Snippet);
+            //await ReplyAsync(searchResult[result].Link);
+            //}
         }
     }
 }

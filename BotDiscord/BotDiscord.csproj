@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Authors>Mikhael</Authors>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
@@ -9,6 +10,7 @@
     <PackageReference Include="Discord.Net" Version="1.0.2" />
     <PackageReference Include="Discord.Net.Commands" Version="1.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <Content Include="resources" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

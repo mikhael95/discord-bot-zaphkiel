@@ -27,7 +27,7 @@ namespace BotDiscord
 
             builder.AddTransient<BasicService>();
             Services = builder.BuildServiceProvider();
-            
+
             await InstallCommands();
 
             await Client.LoginAsync(TokenType.Bot, Token);
@@ -111,7 +111,7 @@ Command Log by {context.User.Username} in #{context.Channel.Name} => {msg.Conten
 
         private Task Log(LogMessage msg)
         {
-            Console.WriteLine(msg.ToString());
+            Console.WriteLine(msg.ToString(null, false));
             return Task.CompletedTask;
         }
     }

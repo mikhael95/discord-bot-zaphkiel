@@ -56,7 +56,7 @@ namespace BotDiscord.Services
         public async Task<List<GoogleViewModel>> GoogleSearchDoc(string keyword)
         {
             var client = new HttpClient();
-            var content = await client.GetAsync($"https://www.googleapis.com/customsearch/v1?key=AIzaSyDJ9CUdfCsjkDIYId3fmfvKVGjbHk48hR8&cx=010065256725983153448:itwnk8vx56k&q={keyword}");
+            var content = await client.GetAsync($"https://www.googleapis.com/customsearch/v1?key=AIzaSyDJ9CUdfCsjkDIYId3fmfvKVGjbHk48hR8&cx=010065256725983153448:itwnk8vx56k&q={keyword}&num=5");
             var response = JsonConvert.DeserializeObject<SearchViewModel>(await content.Content.ReadAsStringAsync());
 
             return response.Items;
@@ -64,7 +64,7 @@ namespace BotDiscord.Services
         public async Task<List<GoogleViewModel>> GoogleSearchVid(string keyword)
         {
             var client = new HttpClient();
-            var content = await client.GetAsync($"https://www.googleapis.com/customsearch/v1?key=AIzaSyDJ9CUdfCsjkDIYId3fmfvKVGjbHk48hR8&cx=010065256725983153448:ryq1o2ocdwe&q={keyword}");
+            var content = await client.GetAsync($"https://www.googleapis.com/customsearch/v1?key=AIzaSyDJ9CUdfCsjkDIYId3fmfvKVGjbHk48hR8&cx=010065256725983153448:ryq1o2ocdwe&q={keyword}&num=5");
             var response = JsonConvert.DeserializeObject<SearchViewModel>(await content.Content.ReadAsStringAsync());
 
             return response.Items;
