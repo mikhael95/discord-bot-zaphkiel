@@ -47,23 +47,23 @@ namespace BotDiscord
         {
             //ID Channel
             var channel = Client.GetChannel(DefaultChannel) as SocketTextChannel;
-            await channel.SendMessageAsync($"Hey {user.Mention}! <:AkarinWave:370855004921135104>");
+            await channel.SendMessageAsync($"Hey {user.Mention}! <:snorlax:375495781303582730>");
         }
 
         public async Task UserLeft(SocketGuildUser user)
         {
             var channel = Client.GetChannel(DefaultChannel) as SocketTextChannel;
-            await channel.SendMessageAsync($"Goodbye {user.Mention}, we will miss you");
+            await channel.SendMessageAsync($"Goodbye {user.Mention}, we will miss you <:mewtwo:375496493119045634>");
         }
         public async Task Disconnected(Exception e)
         {
             var channel = Client.GetChannel(DefaultChannel) as SocketTextChannel;
-            await channel.SendMessageAsync($"Sayonara <:AS003:371971289554092046>");
+            await channel.SendMessageAsync($"Sayonara <:donaldtrump:375318209014005760>");
         }
         public async Task Connected()
         {
             var channel = Client.GetChannel(DefaultChannel) as SocketTextChannel;
-            await channel.SendMessageAsync($"Hi guys, I'm back online <:AS003:371971289554092046>");
+            await channel.SendMessageAsync($"Hi guys, I'm back online <:poke_pika_wink:375316642827337749>");
         }
         public async Task InstallCommands()
         {
